@@ -11,4 +11,7 @@ public interface Contract {
     void rest();
     void undo();
 
+
+    //wizard
+
 }
