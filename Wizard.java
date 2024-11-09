@@ -19,6 +19,8 @@ public class Wizard implements Contract {
      */
     public Wizard(int magic) {
         this.magic = magic;
+        history = new ArrayList<String>();
+        inventory = new ArrayList<String>();
     }
 
     /**
@@ -79,16 +81,16 @@ public class Wizard implements Contract {
                 System.out.println("Learning spells...");
                 double chance = Math.random() * 100 + 1;
                 if (chance > 30) {
-                    magic += 20;
+                    magic += 50;
                     System.out.println("New spell learned! You have gained 20 magic.");
                 } else {
                     System.out.println("Failed to learn spells, try again later.");
                 }
 
-                inventory.remove("Ancient Scroll");
+                inventory.remove("Spell Book");
 
             } else {
-                throw new Exception("You do not have a spell book.");
+                throw new Exception("You do not have a Spell Book. You must examine a Spell Book.");
             }
 
         } catch (Exception e) {
@@ -106,12 +108,12 @@ public class Wizard implements Contract {
     public void use(String item) {
 
         if (!inventory.contains("Wand")) {
-            throw new RuntimeException("Wand is not pulled out. Please use grab() before using.");
+            throw new RuntimeException("Wand is not ready. Please use grab() before using.");
         }
 
         if (item.equals("Abracadabra") || item.equals("Hocus Pocus")) {
             magic -= 10;
-            System.out.println(item);
+            System.out.println(item + "!");
         } else {
             System.out.println("That is not a proper spell!");
         }
@@ -170,19 +172,23 @@ public class Wizard implements Contract {
      * @return how much they shrunk
      */
     public Number shrink() {
-        if (size - .25 == 0 || size - .5 == 0) {
+        if (size - .25 <= 0 || size - .5 <= 0) {
             System.out.println("You are too small! Grow first.");
             return 0;
         }
 
         if (magic > 50) {
             size -= .5;
+            magic -= 50;
             history.add("shrink");
+            System.out.println("Your size is now " +size);
             return .5;
 
         } else if (magic > 25) {
             size -= .25;
+            magic -= 25;
             history.add("shrink");
+            System.out.println("Your size is now " +size);
             return .25;
 
         } else {
@@ -202,12 +208,16 @@ public class Wizard implements Contract {
 
         if (magic > 50) {
             size += .5;
+            magic -= 50;
             history.add("grow");
+            System.out.println("Your size is now " +size);
             return .5;
 
         } else if (magic > 25) {
             size += .25;
+            magic -= 25;
             history.add("grow");
+            System.out.println("Your size is now " +size);
             return .25;
 
         } else {
@@ -231,6 +241,11 @@ public class Wizard implements Contract {
      */
     public void undo() {
 
+        if(history.size() == 0){
+            System.out.println("You have not used grow() or shrink() yet. There is nothing to undo!");
+            return;
+        }
+
         if (history.get(history.size() - 1).equals("grow")) {
             System.out.println("Shrinking back to original size...");
             size = 1;
@@ -242,8 +257,38 @@ public class Wizard implements Contract {
             return;
         }
 
-        System.out.println("You have not used grow() or shrink() yet. There is nothing to undo!");
+    }
 
+    /**
+     * This method prints the amount of magic the wizard has
+     */
+    public void magic(){
+        System.out.println("You have " + this.magic + " magic.");
+    }
+
+    /**
+     * Main for testing
+     * @param args
+     */
+    public static void main(String[] args) {
+        Wizard Donald = new Wizard(100);
+        Donald.undo();
+        Donald.rest();
+        Donald.grow();
+        Donald.magic();
+        Donald.undo();
+        Donald.fly(5, 5);
+        Donald.walk("North");
+        Donald.grab("Wand");
+        Donald.use("Abracadabra");
+        Donald.grab("Spell Book");
+        Donald.examine("Spell Book");
+        Donald.examine("Spell Book");
+        Donald.examine("Spell Book");
+        Donald.drop("Wand");
+        //Donald.use("Hocus Pocus");
+        Donald.magic();
+        
     }
 
 }
